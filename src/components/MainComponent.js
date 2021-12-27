@@ -9,7 +9,7 @@ import { DISHES } from '../shared/dishes';
 import { COMMENTS } from '../shared/comments';
 import { PROMOTIONS } from '../shared/promotions';
 import { LEADERS } from '../shared/leaders';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useParams } from 'react-router-dom';
 
 class Main extends Component {
 
@@ -34,13 +34,23 @@ class Main extends Component {
       )
     }
 
+    const DishWithId = () => {
+      let {dishId} = useParams();
+      return(
+          <DishDetail dish={this.state.dishes.filter((dish) => dish.id === parseInt(dishId,10))[0]} 
+            comments={this.state.comments.filter((comment) => comment.dishId === parseInt(dishId,10))} />
+      );
+    };
+
     return (
       <div>
         <Header />
         <Routes>
-            <Route path='/home' element={HomePage()} />
+            <Route path='/home' element={<HomePage />} />
             <Route path='/menu' element={<Menu dishes={this.state.dishes} />} />
+            <Route path='/menu/:dishId' element={<DishWithId />} />
             <Route path='/contactus' element={<Contact />} />
+            <Route path="*" element={<HomePage />} /> 
         </Routes>
         <Footer />
       </div>
