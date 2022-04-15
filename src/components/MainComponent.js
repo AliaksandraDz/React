@@ -9,6 +9,7 @@ import About from './AboutComponent';
 import { Routes, Route, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { addComment, fetchDishes } from '../redux/ActionCreators';
+import { actions } from 'react-redux-form';
 
 const mapStateToProps = state => {
   return {
@@ -22,7 +23,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   
   addComment: (dishId, rating, author, comment) => dispatch(addComment(dishId, rating, author, comment)),
-  fetchDishes: () => { dispatch(fetchDishes())}
+  fetchDishes: () => { dispatch(fetchDishes())},
+  resetFeedbackForm: () => { dispatch(actions.reset('feedback'))}
 });
 
 class Main extends Component {
@@ -35,7 +37,7 @@ class Main extends Component {
 
     const HomePage = () => {
       return(
-        <Home dish={this.props.dishes.filter((dish) => dish.featured)[0]}
+        <Home dish={this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
           dishesLoading={this.props.dishes.isLoading}
           dishesErrMess={this.props.dishes.errMess}
           promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
@@ -46,7 +48,7 @@ class Main extends Component {
     const DishWithId = () => {
       let {dishId} = useParams();
       return(
-          <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(dishId,10))[0]} 
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(dishId,10))[0]} 
           isLoading={this.props.dishes.isLoading}
           errMess={this.props.dishes.errMess} 
           comments={this.props.comments.filter((comment) => comment.dishId === parseInt(dishId,10))}
@@ -61,7 +63,7 @@ class Main extends Component {
             <Route path='/home' element={<HomePage />} />
             <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
             <Route path='/menu/:dishId' element={<DishWithId />} />
-            <Route path='/contactus' element={<Contact />} />
+            <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm}/>} />
             <Route path='/aboutus' element={<About leaders={this.props.leaders} />} />
             <Route path="*" element={<HomePage />} /> 
         </Routes>
