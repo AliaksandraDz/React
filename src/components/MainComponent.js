@@ -68,14 +68,14 @@ class Main extends Component {
     return (
       <div>
         <Header />
-        <Routes>
-            <Route path='/home' element={<HomePage />} />
-            <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
-            <Route path='/menu/:dishId' element={<DishWithId />} />
-            <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm}/>} />
-            <Route path='/aboutus' element={<About leaders={this.props.leaders} />} />
-            <Route path="*" element={<HomePage />} /> 
-        </Routes>
+          <Routes>
+              <Route path='/home' element={<HomePage />} />
+              <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
+              <Route path='/menu/:dishId' element={<DishWithId />} />
+              <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm}/>} />
+              <Route path='/aboutus' element={<About leaders={this.props.leaders} />} />
+              <Route path="*" element={<HomePage />} /> 
+          </Routes>
         <Footer />
       </div>
     );
