@@ -8,7 +8,7 @@ import Contact from './ContactComponent';
 import About from './AboutComponent';
 import { Routes, Route, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { postComment, fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
+import { postComment, fetchDishes, fetchComments, fetchPromos, fetchLeaders, postFeedback } from '../redux/ActionCreators';
 import { actions } from 'react-redux-form';
 
 const mapStateToProps = state => {
@@ -16,7 +16,8 @@ const mapStateToProps = state => {
     dishes: state.dishes,
     comments: state.comments,
     promotions: state.promotions,
-    leaders: state.leaders
+    leaders: state.leaders,
+    feedback: state.forms
   }
 }
 
@@ -27,7 +28,8 @@ const mapDispatchToProps = dispatch => ({
   resetFeedbackForm: () => { dispatch(actions.reset('feedback'))},
   fetchComments: () => dispatch(fetchComments()),
   fetchPromos: () => dispatch(fetchPromos()),
-  fetchLeaders: () => dispatch(fetchLeaders())
+  fetchLeaders: () => dispatch(fetchLeaders()),
+  postFeedback: (feedback) => dispatch(postFeedback(feedback))
 });
 
 class Main extends Component {
@@ -76,8 +78,8 @@ class Main extends Component {
               <Route path='/home' element={<HomePage />} />
               <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
               <Route path='/menu/:dishId' element={<DishWithId />} />
-              <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm}/>} />
-              <Route path='/aboutus' element={<About leaders={this.props.leaders} />} />
+              <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback} feedback={this.props.forms}/>} />
+              <Route path='/aboutus' element={<About leaders={this.props.leaders} leadersLoading={this.props.leaders.isLoading}  leadersErrMess={this.props.leaders.errMess}/>} />
               <Route path="*" element={<HomePage />} /> 
           </Routes>
         <Footer />

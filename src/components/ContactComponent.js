@@ -14,8 +14,19 @@ class Contact extends Component {
 
     handleSubmit(values) {
         console.log('Current State is: ' + JSON.stringify(values));
-        alert('Current State is: ' + JSON.stringify(values));
+        alert('Thank you for your feedback! ' + JSON.stringify(values));
         this.props.resetFeedbackForm();
+        const feedback = {
+            firstname: values.firstname,
+            lastname: values.lastname,
+            telnum: values.telnum,
+            email: values.email,
+            agree: values.agree,
+            contactType: values.contactType,
+            message: values.message
+          };
+          feedback.date = new Date().toISOString();
+        this.props.postFeedback(feedback);
     }
 
     render() {
@@ -78,7 +89,7 @@ class Contact extends Component {
                                         model=".firstname"
                                         show="touched"
                                         messages={{
-                                            required: 'Required',
+                                            required: 'Required! ',
                                             minLength: 'Must be greater than 2 characters',
                                             maxLength: 'Must be 15 characters or less'
                                         }}
@@ -100,7 +111,7 @@ class Contact extends Component {
                                         model=".lastname"
                                         show="touched"
                                         messages={{
-                                            required: 'Required',
+                                            required: 'Required! ',
                                             minLength: 'Must be greater than 2 characters',
                                             maxLength: 'Must be 15 characters or less'
                                         }}
@@ -122,7 +133,7 @@ class Contact extends Component {
                                         model=".telnum"
                                         show="touched"
                                         messages={{
-                                            required: 'Required',
+                                            required: 'Required! ',
                                             minLength: 'Must be greater than 2 numbers',
                                             maxLength: 'Must be 15 numbers or less',
                                             isNumber: 'Must be a number'
@@ -145,7 +156,7 @@ class Contact extends Component {
                                         model=".email"
                                         show="touched"
                                         messages={{
-                                            required: 'Required',
+                                            required: 'Required! ',
                                             validEmail: 'Invalid Email Address'
                                         }}
                                     />
@@ -191,4 +202,4 @@ class Contact extends Component {
     }
 }
 
-    export default Contact;
+export default Contact;
