@@ -1,14 +1,10 @@
 import React, { Component }  from 'react';
-import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Label, Row, Col } from 'reactstrap';
+import { Card, CardImg, CardImgOverlay, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Modal, ModalHeader, ModalBody, Label, Row, Col } from 'reactstrap'; //react intergation
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
 import { FadeTransform, Fade, Stagger } from 'react-animation-components';
-
-
-const maxLength = (len) => (val) => !(val) || (val.length <= len);
-const minLength = (len) => (val) => val && (val.length >= len);
 
 class CommentForm extends Component{
 
@@ -16,10 +12,12 @@ class CommentForm extends Component{
         super(props);
 
         this.state = {
+            isNavOpen: false,
             isModalOpen: false
         };
 
         this.toggleModal = this.toggleModal.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         
     }
 
@@ -30,7 +28,8 @@ class CommentForm extends Component{
     }
 
     handleSubmit(values) {
-        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.toggleModal();
+        this.props.postComment(this.props.dishId, values.rating, values.comment);
     }
 
     render () {
@@ -42,9 +41,9 @@ class CommentForm extends Component{
                     <ModalBody>
                         <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
                             <Row className="form-group">
-                                <Label htmlFor="rating" md={12}>Rating</Label>
-                                <Col md={12}>
-                                    <Control.select model=".rating" name="rating" className="form-control">
+                                <Col>
+                                <Label htmlFor="rating">Rating</Label>
+                                    <Control.select model=".rating" id="rating" className="form-control">
                                         <option>1</option>
                                         <option>2</option>
                                         <option>3</option>
@@ -54,35 +53,14 @@ class CommentForm extends Component{
                                 </Col>
                             </Row>
                             <Row className="form-group">
-                                <Label htmlFor="author" md={12}>Your Name</Label>
-                                <Col md={12}>
-                                    <Control.text model=".author" id="author" name="author"
-                                        placeholder="Your Name"
-                                        className="form-control"
-                                        validators={{
-                                            minLength: minLength(3), maxLength: maxLength(15)
-                                        }}
-                                    />
-                                    <Errors
-                                        className="text-danger"
-                                        model=".author"
-                                        show="touched"
-                                        messages={{
-                                            minLength: 'Must be greater than 3 characters',
-                                            maxLength: 'Must be 15 characters or less'
-                                        }}
-                                    />
-                                </Col>
-                            </Row>
-                            <Row className="form-group">
-                                <Label htmlFor="comment" md={12}>Comment</Label>
-                                <Col md={12}>
-                                    <Control.textarea model=".comment" id="comment" name="comment"
+                                <Col>
+                                <Label htmlFor="comment">Comment</Label>
+                                    <Control.textarea model=".comment" id="comment"
                                         rows="6"
                                         className="form-control" />
                                 </Col>
                             </Row>
-                            <Button type="submit" value="submit" color="primary">Submit</Button>
+                            <Button type="submit" value="submit" className="bg-primary">Submit</Button>
                         </LocalForm>
                     </ModalBody>
                 </Modal>
@@ -91,7 +69,7 @@ class CommentForm extends Component{
     }
 }
 
-    function RenderDish({dish}) {
+    function RenderDish({dish, favorite, postFavorite}) { //react intergation
             return(
                 <div  className="col-12 col-md-5 m-1">
                     <FadeTransform
@@ -101,6 +79,15 @@ class CommentForm extends Component{
                         }}>
                         <Card>
                             <CardImg top src={baseUrl + dish.image} alt={dish.name} />
+                            <CardImgOverlay> {/* react integration */} 
+                                <Button outline color="primary" onClick={() => favorite ? console.log('Already favorite') : postFavorite(dish._id)}>
+                                    {favorite ?
+                                        <span className="fa fa-heart"></span>
+                                        : 
+                                        <span className="fa fa-heart-o"></span>
+                                    }
+                                </Button>
+                            </CardImgOverlay>
                             <CardBody>
                                 <CardTitle>{dish.name}</CardTitle>
                                 <CardText>{dish.description}</CardText>
@@ -121,9 +108,10 @@ class CommentForm extends Component{
                             {comments.map((comment) => {
                                 return (
                                     <Fade in>
-                                    <li key={comment.id}>
+                                    <li key={comment._id}>
                                     <p>{comment.comment}</p>
-                                    <p>-- {comment.author} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.date)))}</p>
+                                    <p>{comment.rating} stars</p>
+                                    <p>-- {comment.author.firstname}  {comment.author.lastname} , {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse(comment.updatedAt)))}</p>
                                     </li>
                                     </Fade>
                                 );
@@ -173,10 +161,10 @@ class CommentForm extends Component{
                     </div>                
                 </div>
                     <div className="row">
-                        <RenderDish dish = {props.dish} />
+                        <RenderDish dish = {props.dish} favorite={props.favorite} postFavorite={props.postFavorite}/>
                         <RenderComments comments = {props.comments} 
                             postComment={props.postComment}
-                            dishId={props.dish.id}/>
+                            dishId={props.dish._id}/>
                     </div>
                 </div>
             );

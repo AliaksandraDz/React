@@ -1,4 +1,4 @@
-import * as ActionTypes from './ActionTypes';
+// import * as ActionTypes from './ActionTypes';
 
 export const InitialFeedback = {
     firstname: '',
@@ -10,14 +10,14 @@ export const InitialFeedback = {
     message: ''
 };
 
-export const Feedback = (state = { errMess: null, feedback: []}, action) => {
-    switch (action.type) {
-        case ActionTypes.ADD_FEEDBACK:
-            var feedback = action.payload;
-            alert(feedback);
-            return {...state, feedback: state.feedback.concat(feedback)};
+// export const Feedback = (state = { errMess: null, feedback: []}, action) => {
+//     switch (action.type) {
+//         case ActionTypes.POST_FEEDBACK:
+//             var feedback = action.payload;
+//             alert(feedback);
+//             return {...state, feedback: state.feedback.concat(feedback)};
 
-        default:
-            return state;
-    }
-};
+//         default:
+//             return state;
+//     }
+// };

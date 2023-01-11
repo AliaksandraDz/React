@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Breadcrumb, BreadcrumbItem,
     Button, Row, Col, Label } from 'reactstrap';
-import { Control, Form, Errors, actions } from 'react-redux-form';
+import { Control, Form, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
 
 const required = (val) => val && val.length;
@@ -12,21 +12,16 @@ const validEmail = (val) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(val
 
 class Contact extends Component {
 
+    constructor(props) { //react integration
+        super(props);
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
     handleSubmit(values) {
         console.log('Current State is: ' + JSON.stringify(values));
-        alert('Thank you for your feedback! ' + JSON.stringify(values));
         this.props.resetFeedbackForm();
-        const feedback = {
-            firstname: values.firstname,
-            lastname: values.lastname,
-            telnum: values.telnum,
-            email: values.email,
-            agree: values.agree,
-            contactType: values.contactType,
-            message: values.message
-          };
-          feedback.date = new Date().toISOString();
-        this.props.postFeedback(feedback);
+        this.props.postFeedback(values);
     }
 
     render() {

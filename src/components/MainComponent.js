@@ -4,11 +4,12 @@ import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Menu from './MenuComponent';
 import DishDetail from './DishDetailComponent';
+import Favorites from './FavoriteComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
 import { Routes, Route, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { postComment, fetchDishes, fetchComments, fetchPromos, fetchLeaders, postFeedback } from '../redux/ActionCreators';
+import { postComment, fetchDishes, fetchComments, fetchPromos, fetchLeaders, postFeedback, loginUser, logoutUser, fetchFavorites, postFavorite, deleteFavorite } from '../redux/ActionCreators';
 import { actions } from 'react-redux-form';
 
 const mapStateToProps = state => {
@@ -17,19 +18,28 @@ const mapStateToProps = state => {
     comments: state.comments,
     promotions: state.promotions,
     leaders: state.leaders,
-    feedback: state.forms
+    // feedback: state.forms,
+    //react integrartion
+    favorites: state.favorites,
+    auth: state.auth
   }
 }
 
 const mapDispatchToProps = dispatch => ({
   
-  postComment: (dishId, rating, author, comment) => dispatch(postComment(dishId, rating, author, comment)),
+  postComment: (dishId, rating, comment) => dispatch(postComment(dishId, rating, comment)), ////react integrartion
   fetchDishes: () => { dispatch(fetchDishes())},
   resetFeedbackForm: () => { dispatch(actions.reset('feedback'))},
   fetchComments: () => dispatch(fetchComments()),
   fetchPromos: () => dispatch(fetchPromos()),
   fetchLeaders: () => dispatch(fetchLeaders()),
-  postFeedback: (feedback) => dispatch(postFeedback(feedback))
+  postFeedback: (feedback) => dispatch(postFeedback(feedback)),
+  //react integrartion
+  loginUser: (creds) => dispatch(loginUser(creds)),
+  logoutUser: () => dispatch(logoutUser()),
+  fetchFavorites: () => dispatch(fetchFavorites()),
+  postFavorite: (dishId) => dispatch(postFavorite(dishId)),
+  deleteFavorite: (dishId) => dispatch(deleteFavorite(dishId))
 });
 
 class Main extends Component {
@@ -38,7 +48,8 @@ class Main extends Component {
     this.props.fetchDishes();
     this.props.fetchComments();
     this.props.fetchPromos();
-    this.props.fetchLeaders()
+    this.props.fetchLeaders();
+    this.props.fetchFavorites();
   }
 
   render() {
@@ -56,30 +67,57 @@ class Main extends Component {
           leadersLoading={this.props.leaders.isLoading}
           leadersErrMess={this.props.leaders.errMess}
         />
-      )
+      );
     }
 
     const DishWithId = () => {
       let {dishId} = useParams();
       return(
-          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(dishId,10))[0]} 
+          this.props.auth.isAuthenticated //react integration
+          ?
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === parseInt(dishId,10))[0]} 
           isLoading={this.props.dishes.isLoading}
           errMess={this.props.dishes.errMess}
           comments={this.props.comments.comments.filter((comment) => comment.dishId === parseInt(dishId,10))}
           commentsErrMess={this.props.comments.errMess}
-          postComment={this.props.postComment} />
+          postComment={this.props.postComment} 
+          favorite={this.props.favorites.favorites.dishes.some((dish) => dish._id === parseInt(dishId,10))}
+          postFavorite={this.props.postFavorite}
+          />
+          :
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === parseInt(dishId,10))[0]} 
+          isLoading={this.props.dishes.isLoading}
+          errMess={this.props.dishes.errMess}
+          comments={this.props.comments.comments.filter((comment) => comment.dishId === parseInt(dishId,10))}
+          commentsErrMess={this.props.comments.errMess}
+          postComment={this.props.postComment} 
+          favorite={false}
+          postFavorite={this.props.postFavorite}
+          />
       );
-    };
+    }
+
+    
+    const PrivateRoute = ({ component: Component, ...rest }) => (
+      <Route {...rest} render={(props) => (
+        this.props.auth.isAuthenticated
+          ? <Component {...props} />
+          : <Route path='/home' element={<HomePage />} state={ this.props.location } />
+      )} />
+    );
 
     return (
       <div>
-        <Header />
+        <Header auth={this.props.auth} 
+          loginUser={this.props.loginUser} 
+          logoutUser={this.props.logoutUser} />
           <Routes>
               <Route path='/home' element={<HomePage />} />
               <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
               <Route path='/menu/:dishId' element={<DishWithId />} />
-              <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback} feedback={this.props.forms}/>} />
+              <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback}/>} />
               <Route path='/aboutus' element={<About leaders={this.props.leaders} leadersLoading={this.props.leaders.isLoading}  leadersErrMess={this.props.leaders.errMess}/>} />
+              <PrivateRoute path='/favorites' element={<Favorites favorites={this.props.favorites} deleteFavorite={this.props.deleteFavorite}/>}/>
               <Route path="*" element={<HomePage />} /> 
           </Routes>
         <Footer />
