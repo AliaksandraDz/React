@@ -7,7 +7,7 @@ import DishDetail from './DishDetailComponent';
 import Favorites from './FavoriteComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
-import { Routes, Route, useParams } from 'react-router-dom';
+import { Routes, Route, useParams, Outlet, Navigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { postComment, fetchDishes, fetchComments, fetchPromos, fetchLeaders, postFeedback, loginUser, logoutUser, fetchFavorites, postFavorite, deleteFavorite } from '../redux/ActionCreators';
 import { actions } from 'react-redux-form';
@@ -30,8 +30,8 @@ const mapDispatchToProps = dispatch => ({
   postComment: (dishId, rating, comment) => dispatch(postComment(dishId, rating, comment)), ////react integrartion
   fetchDishes: () => { dispatch(fetchDishes())},
   resetFeedbackForm: () => { dispatch(actions.reset('feedback'))},
-  fetchComments: () => dispatch(fetchComments()),
-  fetchPromos: () => dispatch(fetchPromos()),
+  fetchComments: () => { dispatch(fetchComments())},
+  fetchPromos: () => {dispatch(fetchPromos())},
   fetchLeaders: () => dispatch(fetchLeaders()),
   postFeedback: (feedback) => dispatch(postFeedback(feedback)),
   //react integrartion
@@ -56,16 +56,15 @@ class Main extends Component {
 
     const HomePage = () => {
       return(
-        <Home 
-          dish={this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
+        <Home dish={this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
           dishesLoading={this.props.dishes.isLoading}
-          dishErrMess={this.props.dishes.errMess}
+          dishesErrMess={this.props.dishes.errMess}
           promotion={this.props.promotions.promotions.filter((promo) => promo.featured)[0]}
-          promoLoading={this.props.promotions.isLoading}
-          promoErrMess={this.props.promotions.errMess}
+          promosLoading={this.props.promotions.isLoading}
+          promosErrMess={this.props.promotions.errMess}
           leader={this.props.leaders.leaders.filter((leader) => leader.featured)[0]}
-          leadersLoading={this.props.leaders.isLoading}
-          leadersErrMess={this.props.leaders.errMess}
+          leaderLoading={this.props.leaders.isLoading}
+          leaderErrMess={this.props.leaders.errMess}
         />
       );
     }
@@ -98,13 +97,15 @@ class Main extends Component {
     }
 
     
-    const PrivateRoute = ({ component: Component, ...rest }) => (
-      <Route {...rest} render={(props) => (
-        this.props.auth.isAuthenticated
-          ? <Component {...props} />
-          : <Route path='/home' element={<HomePage />} state={ this.props.location } />
-      )} />
-    );
+    const PrivateRoute = (children) => {
+      const isAuthenticated = this.props.auth.isAuthenticated;
+          
+      if (isAuthenticated ) {
+        return children
+      }
+        
+      return <Navigate to="/home" />
+    }
 
     return (
       <div>
@@ -117,7 +118,14 @@ class Main extends Component {
               <Route path='/menu/:dishId' element={<DishWithId />} />
               <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback}/>} />
               <Route path='/aboutus' element={<About leaders={this.props.leaders} leadersLoading={this.props.leaders.isLoading}  leadersErrMess={this.props.leaders.errMess}/>} />
-              <PrivateRoute path='/favorites' element={<Favorites favorites={this.props.favorites} deleteFavorite={this.props.deleteFavorite}/>}/>
+              <Route
+          path="/favorites"
+          element={
+            <PrivateRoute>
+              <Favorites favorites={this.props.favorites} deleteFavorite={this.props.deleteFavorite}/>
+            </PrivateRoute>
+          }
+        />
               <Route path="*" element={<HomePage />} /> 
           </Routes>
         <Footer />
