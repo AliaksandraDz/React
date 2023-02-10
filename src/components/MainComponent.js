@@ -71,23 +71,26 @@ class Main extends Component {
 
     const DishWithId = () => {
       let {dishId} = useParams();
+      let arr = this.props.dishes.dishes;
+      let test = this.props.dishes.dishes.includes(item.name == "Uthappizza")
+      console.log(test)
       return(
           this.props.auth.isAuthenticated //react integration
           ?
-          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === parseInt(dishId,10))[0]} 
+          <DishDetail dish={arr.filter(item => item._id === dishId)[0]}
           isLoading={this.props.dishes.isLoading}
           errMess={this.props.dishes.errMess}
-          comments={this.props.comments.comments.filter((comment) => comment.dishId === parseInt(dishId,10))}
+          comments={this.props.comments.comments.filter(comment => comment.dish === dishId)}
           commentsErrMess={this.props.comments.errMess}
           postComment={this.props.postComment} 
-          favorite={this.props.favorites.favorites.dishes.some((dish) => dish._id === parseInt(dishId,10))}
+          favorite={this.props.favorites.favorites.dishes.some(dish => dish._id === dishId)}
           postFavorite={this.props.postFavorite}
           />
           :
-          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === parseInt(dishId,10))[0]} 
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === dishId)[0]} 
           isLoading={this.props.dishes.isLoading}
           errMess={this.props.dishes.errMess}
-          comments={this.props.comments.comments.filter((comment) => comment.dishId === parseInt(dishId,10))}
+          comments={this.props.comments.comments.filter((comment) => comment.dish === dishId)}
           commentsErrMess={this.props.comments.errMess}
           postComment={this.props.postComment} 
           favorite={false}
@@ -95,16 +98,14 @@ class Main extends Component {
           />
       );
     }
+    console.log(DishDetail.dish)
 
-    
-    const PrivateRoute = (children) => {
-      const isAuthenticated = this.props.auth.isAuthenticated;
-          
-      if (isAuthenticated ) {
-        return children
-      }
-        
-      return <Navigate to="/home" />
+    const PrivateRoute = () => {
+      return (
+        this.props.auth.isAuthenticated
+        ? <Outlet/> 
+        : <Navigate to='/home'/>
+      )
     }
 
     return (
@@ -118,14 +119,9 @@ class Main extends Component {
               <Route path='/menu/:dishId' element={<DishWithId />} />
               <Route path='/contactus' element={<Contact resetFeedbackForm={this.props.resetFeedbackForm} postFeedback={this.props.postFeedback}/>} />
               <Route path='/aboutus' element={<About leaders={this.props.leaders} leadersLoading={this.props.leaders.isLoading}  leadersErrMess={this.props.leaders.errMess}/>} />
-              <Route
-          path="/favorites"
-          element={
-            <PrivateRoute>
-              <Favorites favorites={this.props.favorites} deleteFavorite={this.props.deleteFavorite}/>
-            </PrivateRoute>
-          }
-        />
+              <Route element={<PrivateRoute/>}>
+                <Route path='/favorites' element={<Favorites favorites={this.props.favorites} deleteFavorite={this.props.deleteFavorite}/>} />
+              </Route>
               <Route path="*" element={<HomePage />} /> 
           </Routes>
         <Footer />
