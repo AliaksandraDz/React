@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Media, Breadcrumb, BreadcrumbItem, Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { baseUrl } from '../shared/baseUrl';
+// import { baseUrl } from '../shared/baseUrl';
 import { Loading } from './LoadingComponent';
 
 function RenderMenuItem({ dish, deleteFavorite }) {
@@ -43,7 +43,8 @@ const Favorites = (props) => {
     }
     else if (props.favorites.favorites) {
 
-        const favorites = props.favorites.favorites.dishes.map((dish) => {
+        const favorites = props.favorites.favorites.dishes.map((dishId) => {
+            let dish = props.dishes.dishes.filter((dish) => dish._id === dishId)[0];
             return (
                 <div key={dish._id} className="col-12 mt-5">
                     <RenderMenuItem dish={dish} deleteFavorite={props.deleteFavorite} />

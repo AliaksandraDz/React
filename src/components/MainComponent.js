@@ -38,6 +38,7 @@ const mapDispatchToProps = dispatch => ({
   loginUser: (creds) => dispatch(loginUser(creds)),
   logoutUser: () => dispatch(logoutUser()),
   fetchFavorites: () => dispatch(fetchFavorites()),
+  googleLogin: () => dispatch(googleLogin()), //firebase
   postFavorite: (dishId) => dispatch(postFavorite(dishId)),
   deleteFavorite: (dishId) => dispatch(deleteFavorite(dishId))
 });
@@ -50,6 +51,10 @@ class Main extends Component {
     this.props.fetchPromos();
     this.props.fetchLeaders();
     this.props.fetchFavorites();
+  }
+
+  componentWillUnmount() {
+    this.props.logoutUser();
   }
 
   render() {
@@ -112,7 +117,8 @@ class Main extends Component {
       <div>
         <Header auth={this.props.auth} 
           loginUser={this.props.loginUser} 
-          logoutUser={this.props.logoutUser} />
+          logoutUser={this.props.logoutUser} 
+          googleLogin={this.props.googleLogin}/>
           <Routes>
               <Route path='/home' element={<HomePage />} />
               <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
