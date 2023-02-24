@@ -15,7 +15,6 @@ class Header extends Component {
         this.toggleNav = this.toggleNav.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
-        this.handleGoogleLogin = this.handleGoogleLogin.bind(this); //firebase
         this.handleLogout = this.handleLogout.bind(this); //react integration
       }
 
@@ -36,12 +35,6 @@ class Header extends Component {
         this.props.loginUser({username: this.username.value, password: this.password.value});
         event.preventDefault();
 
-    }
-
-    handleGoogleLogin(event) { //firebase
-        this.toggleModal();
-        this.props.googleLogin();
-        event.preventDefault();
     }
 
     handleLogout() {
@@ -147,8 +140,6 @@ class Header extends Component {
                                 </FormGroup>
                                 <Button type="submit" value="submit" color="primary">Login</Button>
                             </Form>
-                            <p></p>
-                        <Button color="danger" onClick={this.handleGoogleLogin}><span className="fa fa-google fa-lg"></span> Login with Google</Button>
                     </ModalBody>
                 </Modal>
             </React.Fragment>

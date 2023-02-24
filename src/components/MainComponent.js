@@ -38,7 +38,6 @@ const mapDispatchToProps = dispatch => ({
   loginUser: (creds) => dispatch(loginUser(creds)),
   logoutUser: () => dispatch(logoutUser()),
   fetchFavorites: () => dispatch(fetchFavorites()),
-  googleLogin: () => dispatch(googleLogin()), //firebase
   postFavorite: (dishId) => dispatch(postFavorite(dishId)),
   deleteFavorite: (dishId) => dispatch(deleteFavorite(dishId))
 });
@@ -76,13 +75,15 @@ class Main extends Component {
 
     const DishWithId = () => {
       let {dishId} = useParams();
-      let arr = this.props.dishes.dishes;
-      let test = this.props.dishes.dishes.includes(item.name == "Uthappizza")
-      console.log(test)
+      if(this.props.favorites.favorites!=null){
+        if(Array.isArray(this.props.favorites.favorites)) {
+          this.props.favorites.favorites=this.props.favorites.favorites[0]
+        }
+      }
       return(
-          this.props.auth.isAuthenticated //react integration
+        (this.props.auth.isAuthenticated && !this.props.favorites.isLoading) //react integration
           ?
-          <DishDetail dish={arr.filter(item => item._id === dishId)[0]}
+          <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === dishId)[0]}
           isLoading={this.props.dishes.isLoading}
           errMess={this.props.dishes.errMess}
           comments={this.props.comments.comments.filter(comment => comment.dish === dishId)}
@@ -95,7 +96,7 @@ class Main extends Component {
           <DishDetail dish={this.props.dishes.dishes.filter((dish) => dish._id === dishId)[0]} 
           isLoading={this.props.dishes.isLoading}
           errMess={this.props.dishes.errMess}
-          comments={this.props.comments.comments.filter((comment) => comment.dish === dishId)}
+          comments={this.props.comments.comments.filter(comment => comment.dish === dishId)}
           commentsErrMess={this.props.comments.errMess}
           postComment={this.props.postComment} 
           favorite={false}
@@ -103,7 +104,6 @@ class Main extends Component {
           />
       );
     }
-    console.log(DishDetail.dish)
 
     const PrivateRoute = () => {
       return (
@@ -117,8 +117,7 @@ class Main extends Component {
       <div>
         <Header auth={this.props.auth} 
           loginUser={this.props.loginUser} 
-          logoutUser={this.props.logoutUser} 
-          googleLogin={this.props.googleLogin}/>
+          logoutUser={this.props.logoutUser} />
           <Routes>
               <Route path='/home' element={<HomePage />} />
               <Route path='/menu' element={<Menu dishes={this.props.dishes} />} />
