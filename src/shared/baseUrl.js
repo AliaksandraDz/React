@@ -1,1 +1,1 @@
-export const baseUrl = 'https://localhost:3443/';
+export const baseUrl = 'https://ec2-13-51-170-144.eu-north-1.compute.amazonaws.com:3443/';
